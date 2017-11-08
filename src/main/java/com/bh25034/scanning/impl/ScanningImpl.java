@@ -2,6 +2,9 @@ package com.bh25034.scanning.impl;
 
 import java.io.IOException;
 import java.util.List;
+
+import javax.net.ssl.SSLHandshakeException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -50,18 +53,17 @@ public class ScanningImpl implements Scanning {
 					.timeout(this.timeout)
 					.get();
 			
+			
 			Elements links = this.mainDocument.select("a[href]");
 			String text = "";
 			
 			for (Element link : links) {
 				
 				text = link.attr("abs:href");
-				//this.links.add(text);
-				//pl("Link found: " + text);
 				
-				if (! this.linksMap.containsKey(text)) {
+				if ((! this.linksMap.containsKey(text)) && (link.baseUri().equals(this.baseURL))) {
 				
-					pl("Link found: " + text);
+					//pl("Link found: " + text);
 					this.linksMap.put(text, text);
 					this.scanLinks(text);
 				
@@ -82,14 +84,21 @@ public class ScanningImpl implements Scanning {
 		catch (UnsupportedMimeTypeException umte) {
 			
 			pl(umte.getMessage());
-			pl("Not a valid URL");
+			pl("Not a valid URL: " + URL);
 			
 		}
 		
 		catch (IllegalArgumentException iae) {
 			
 			pl(iae.getMessage());
-			pl("Not a valid URL");
+			pl("Not a valid URL: " + URL);
+			
+		}
+		
+		catch (SSLHandshakeException she) {
+			
+			pl(she.getMessage());
+			pl("Ignoring security handshake excetion for: " + URL);
 			
 		}
 		

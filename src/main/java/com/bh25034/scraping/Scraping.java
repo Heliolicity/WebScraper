@@ -4,8 +4,6 @@ import java.io.IOException;
 
 public interface Scraping {
 
-	public void scrapeLinks() throws IOException;
-	
-	public void scrapeFileTypes(String extension);
+	public void scrapeFileTypes() throws IOException;
 	
 }

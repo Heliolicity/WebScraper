@@ -3,11 +3,18 @@ package com.bh25034.scraping.impl;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.net.ssl.SSLHandshakeException;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.jsoup.HttpStatusException;
-import org.jsoup.Jsoup;  
+import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -16,84 +23,102 @@ import com.bh25034.scraping.Scraping;
 
 public class ScrapingImpl implements Scraping {
 
-	private String baseURL;
 	private String extension;
 	private Document mainDocument;
 	private int timeout = 0;
+	private HashMap<String, String> linksMap;
 	
-	public ScrapingImpl(String baseURL, String extension, int timeout) {
+	public ScrapingImpl(HashMap<String, String> linksMap, String extension, int timeout) {
 		super();
-		this.baseURL = baseURL;
+		this.linksMap = linksMap;
 		this.extension = extension;
 		this.timeout = timeout;
 	}
 	
-	public ScrapingImpl(String baseURL, String extension) {
+	public ScrapingImpl(HashMap<String, String> linksMap, String extension) {
 		super();
-		this.baseURL = baseURL;
+		this.linksMap = linksMap;
 		this.extension = extension;
 		this.timeout = 300000;
 	}
 
 	public ScrapingImpl() { super(); }
 	
-	public void scrapeLinks() throws IOException {
+	public void scrapeFileTypes() throws IOException {
 		
-		String text = "";
-		int index = 0;
-		String URL = "";
-		
-		try {
+		Set set = this.linksMap.entrySet();
+	    Iterator iterator = set.iterator();
+	    String link = "";
+	    
+	    while (iterator.hasNext()) {
+	         
+	    	Map.Entry entry = (Map.Entry) iterator.next();
+	        link = (String) entry.getKey();
+	        
+	        try {
+	        
+	        	if (this.timeout <= 0) this.timeout = 300000;
+				
+				this.mainDocument = Jsoup.connect(link)
+						.userAgent("Mozilla")
+						.cookie("auth", "token")
+						.timeout(this.timeout)
+						.get();
+				
+				Elements media = this.mainDocument.select("[src]");
+	        	this.printDetails(media);
+				
+				/*for (Element src : media) {
+					
+		            if (src.tagName().equals("img"))
+		                pl(src.tagName() + " " + src.attr("abs:src") + " " + src.attr("width") + " " + src.attr("height") + " " + trim(src.attr("alt"), 20));
+		            else
+		                pl(src.tagName() + " " + src.attr("abs:src"));
+		            
+		        }*/
+				
+	        }
 			
-			if (this.timeout <= 0) this.timeout = 300000;
-			
-			this.mainDocument = Jsoup.connect(this.baseURL)
-					.data("query", "Java")
-					.userAgent("Mozilla")
-					.cookie("auth", "token")
-					.timeout(this.timeout)
-					.get();
-			
-			/*
-			Elements elements = this.mainDocument.getAllElements();
-			Elements heads = this.mainDocument.select("head");
-			this.printDetails(heads);
-			Elements bodies = this.mainDocument.select("body");
-			this.printDetails(bodies);
-			Elements divs = this.mainDocument.select("div");
-			this.printDetails(divs);
-			*/
-			
-			Elements links = this.mainDocument.select("a[href]");
-	        this.printDetails(links);
-			
-	        //Elements media = this.mainDocument.select("[src]");
-	        //Elements imports = this.mainDocument.select("link[href]");
+			catch (HttpStatusException hse) {
+				
+				pl("Error getting data for " + link);
+				pl(hse.getMessage());
+				hse.printStackTrace();
+				
+			}
 
+			catch (UnsupportedMimeTypeException umte) {
+				
+				pl(umte.getMessage());
+				pl("Not a valid URL: " + link);
+				
+			}
 			
-			
-		}
-		
-		catch (HttpStatusException hse) {
-			
-			pl("Error getting data for " + URL);
-			pl(hse.getMessage());
-			hse.printStackTrace();
-			
-		}
+			catch (IllegalArgumentException iae) {
+				
+				pl(iae.getMessage());
+				pl("Not a valid URL: " + link);
+				
+			}
+	        
+			catch (SSLHandshakeException she) {
+				
+				pl(she.getMessage());
+				pl("Ignoring security handshake excetion for: " + link);
+				
+			}
+
+	        
+	    }
 		
 	}
-	
-	public void scrapeFileTypes(String extension) {
-		
+
+	public HashMap<String, String> getLinksMap() {
+		return linksMap;
 	}
 
-	public String getBaseURL() {
-		return baseURL;
-	}
-
-	public void setBaseURL(String baseURL) {
-		this.baseURL = baseURL;
+	public void setLinksMap(HashMap<String, String> linksMap) {
+		this.linksMap = linksMap;
 	}
 
 	public String getExtension() {
@@ -122,19 +147,31 @@ public class ScrapingImpl implements Scraping {
 	
 	private void printDetails(Elements elements) {
 		
-		pl("ELEMENTS FOUND: " + elements.size());
+		try {
 		
-		for (Element element : elements) {
+			pl("ELEMENTS FOUND: " + elements.size());
 			
-			pl("CSS SELECTOR: " + element.cssSelector());
-			pl("ID: " + element.id());
-			pl("NODE NAME: " + element.nodeName());
-			pl("TAG NAME: " + element.tagName());
-			pl("HTML: " + element.html());
-			pl("DATA: " + element.data());
-			pl("TEXT: " + element.text());
-			pl("ABS: " + element.attr("abs:href"));
-			pl();
+			for (Element element : elements) {
+				
+				pl("CSS SELECTOR: " + element.cssSelector());
+				pl("ID: " + element.id());
+				pl("NODE NAME: " + element.nodeName());
+				pl("TAG NAME: " + element.tagName());
+				pl("HTML: " + element.html());
+				pl("DATA: " + element.data());
+				pl("TEXT: " + element.text());
+				pl("HREF: " + element.attr("abs:href"));
+				pl("SRC: " + element.attr("abs:src"));
+				pl("ALT: " + element.attr("alt"));
+				pl();
+				
+			}
+		
+		}
+		
+		catch (Exception e) {
+			
+			pl(e.getMessage());
 			
 		}
 		

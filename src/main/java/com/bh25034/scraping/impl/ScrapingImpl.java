@@ -27,12 +27,14 @@ public class ScrapingImpl implements Scraping {
 	private Document mainDocument;
 	private int timeout = 0;
 	private HashMap<String, String> linksMap;
+	private HashMap<String, String> extensionsMap;
 	
 	public ScrapingImpl(HashMap<String, String> linksMap, String extension, int timeout) {
 		super();
 		this.linksMap = linksMap;
 		this.extension = extension;
 		this.timeout = timeout;
+		this.extensionsMap = new HashMap<String, String>();
 	}
 	
 	public ScrapingImpl(HashMap<String, String> linksMap, String extension) {
@@ -40,15 +42,20 @@ public class ScrapingImpl implements Scraping {
 		this.linksMap = linksMap;
 		this.extension = extension;
 		this.timeout = 300000;
+		this.extensionsMap = new HashMap<String, String>();
 	}
 
-	public ScrapingImpl() { super(); }
+	public ScrapingImpl() { 
+		super(); 
+		this.extensionsMap = new HashMap<String, String>();
+	}
 	
 	public void scrapeFileTypes() throws IOException {
 		
 		Set set = this.linksMap.entrySet();
 	    Iterator iterator = set.iterator();
 	    String link = "";
+	    String text = "";
 	    
 	    while (iterator.hasNext()) {
 	         
@@ -66,7 +73,20 @@ public class ScrapingImpl implements Scraping {
 						.get();
 				
 				Elements media = this.mainDocument.select("[src]");
-	        	this.printDetails(media);
+	        	//this.printDetails(media);
+				
+				for (Element src : media) {
+					
+					text = src.attr("abs:src");
+					
+					if ((this.extension.equals(src.tagName())) && (! this.extensionsMap.containsKey(text))) {
+						
+						this.extensionsMap.put(text, text);
+						this.printDetail(src);
+						
+					}
+					
+				}
 				
 				/*for (Element src : media) {
 					
@@ -81,9 +101,8 @@ public class ScrapingImpl implements Scraping {
 			
 			catch (HttpStatusException hse) {
 				
-				pl("Error getting data for " + link);
 				pl(hse.getMessage());
-				hse.printStackTrace();
+				pl("Error getting data for: " + link);
 				
 			}
 
@@ -137,6 +156,14 @@ public class ScrapingImpl implements Scraping {
 		this.mainDocument = mainDocument;
 	}
 
+	public HashMap<String, String> getExtensionsMap() {
+		return extensionsMap;
+	}
+
+	public void setExtensionsMap(HashMap<String, String> extensionsMap) {
+		this.extensionsMap = extensionsMap;
+	}
+
 	public long getTimeout() {
 		return timeout;
 	}
@@ -153,20 +180,46 @@ public class ScrapingImpl implements Scraping {
 			
 			for (Element element : elements) {
 				
-				pl("CSS SELECTOR: " + element.cssSelector());
+				/*pl("CSS SELECTOR: " + element.cssSelector());
 				pl("ID: " + element.id());
 				pl("NODE NAME: " + element.nodeName());
 				pl("TAG NAME: " + element.tagName());
 				pl("HTML: " + element.html());
 				pl("DATA: " + element.data());
 				pl("TEXT: " + element.text());
-				pl("HREF: " + element.attr("abs:href"));
+				pl("HREF: " + element.attr("abs:href"));*/
 				pl("SRC: " + element.attr("abs:src"));
-				pl("ALT: " + element.attr("alt"));
-				pl();
+				/*pl("ALT: " + element.attr("alt"));
+				pl();*/
 				
 			}
 		
+		}
+		
+		catch (Exception e) {
+			
+			pl(e.getMessage());
+			
+		}
+		
+	}
+	
+	private void printDetail(Element element) {
+		
+		try {
+				
+			//pl("CSS SELECTOR: " + element.cssSelector());
+			//pl("ID: " + element.id());
+			//pl("NODE NAME: " + element.nodeName());
+			pl("TAG NAME: " + element.tagName());
+			//pl("HTML: " + element.html());
+			//pl("DATA: " + element.data());
+			//pl("TEXT: " + element.text());
+			//pl("HREF: " + element.attr("abs:href"));
+			//pl("SRC: " + element.attr("abs:src"));
+			//pl("ALT: " + element.attr("alt"));
+			//pl();
+			
 		}
 		
 		catch (Exception e) {

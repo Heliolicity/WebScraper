@@ -65,7 +65,7 @@ public class ScanningImpl implements Scanning {
 				
 					//pl("Link found: " + text);
 					this.linksMap.put(text, text);
-					this.scanLinks(text);
+					//this.scanLinks(text);
 				
 				}
 				

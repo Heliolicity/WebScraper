@@ -64,7 +64,8 @@ public class ScanningImpl implements Scanning {
 				if ((! this.linksMap.containsKey(text)) && (link.baseUri().equals(this.baseURL))) {
 				
 					//pl("Link found: " + text);
-					this.linksMap.put(text, text);
+					//this.linksMap.put(text, text);
+					this.linksMap.put(text, "Y");
 					//this.scanLinks(text);
 				
 				}

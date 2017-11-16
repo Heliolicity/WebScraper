@@ -60,14 +60,14 @@ public class DownloadingImpl implements Downloading {
 			catch (IOException ioe) {
 				
 				downloaded = false;
-				pl(ioe.getMessage());
+				//pl(ioe.getMessage());
 				
 			}
 			
 			catch (StringIndexOutOfBoundsException sioobe) {
 				
 				downloaded = false;
-				pl(sioobe.getMessage());
+				//pl(sioobe.getMessage());
 				
 			}
 		

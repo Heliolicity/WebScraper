@@ -72,8 +72,27 @@ public class ScrapingImpl implements Scraping {
 						.timeout(this.timeout)
 						.get();
 				
-				Elements media = this.mainDocument.select("[src]");
-	        	//this.printDetails(media);
+				/*Elements all = this.mainDocument.getAllElements();
+				
+				for (Element element : all) {
+					
+					this.printDetail(element);
+					
+				}*/
+				
+				/*Elements par = this.mainDocument.select("p");
+				
+				for (Element element : par) {
+					
+					this.printDetail(element);
+					
+				}*/
+				
+				//text = this.mainDocument.body().text();
+				//pl(text);
+				
+				/*Elements media = this.mainDocument.select("[src]");
+	        	this.printDetails(media);
 				
 				for (Element src : media) {
 					
@@ -82,20 +101,29 @@ public class ScrapingImpl implements Scraping {
 					if ((this.extension.equals(src.tagName())) && (! this.extensionsMap.containsKey(text))) {
 						
 						this.extensionsMap.put(text, text);
-						this.printDetail(src);
+						//this.printDetail(src);
 						
 					}
 					
 				}
+				*/
 				
-				/*for (Element src : media) {
+				Elements elements = this.mainDocument.getAllElements();
+				
+				for (Element element : elements) {
 					
-		            if (src.tagName().equals("img"))
-		                pl(src.tagName() + " " + src.attr("abs:src") + " " + src.attr("width") + " " + src.attr("height") + " " + trim(src.attr("alt"), 20));
-		            else
-		                pl(src.tagName() + " " + src.attr("abs:src"));
-		            
-		        }*/
+					text = element.text();
+					
+					if ((this.extension.equals(element.tagName())) && (! this.extensionsMap.containsKey(text))) {
+						
+						//pl("ADDED");
+						//this.printDetail(element);
+						//this.extensionsMap.put(text, text);
+						this.extensionsMap.put(text, "Y");
+						
+					}
+					
+				}
 				
 	        }
 			
@@ -180,17 +208,17 @@ public class ScrapingImpl implements Scraping {
 			
 			for (Element element : elements) {
 				
-				/*pl("CSS SELECTOR: " + element.cssSelector());
-				pl("ID: " + element.id());
-				pl("NODE NAME: " + element.nodeName());
-				pl("TAG NAME: " + element.tagName());
-				pl("HTML: " + element.html());
-				pl("DATA: " + element.data());
+				//pl("CSS SELECTOR: " + element.cssSelector());
+				//pl("ID: " + element.id());
+				//pl("NODE NAME: " + element.nodeName());
+				//pl("TAG NAME: " + element.tagName());
+				//pl("HTML: " + element.html());
+				//pl("DATA: " + element.data());
 				pl("TEXT: " + element.text());
-				pl("HREF: " + element.attr("abs:href"));*/
-				pl("SRC: " + element.attr("abs:src"));
-				/*pl("ALT: " + element.attr("alt"));
-				pl();*/
+				//pl("HREF: " + element.attr("abs:href"));
+				//pl("SRC: " + element.attr("abs:src"));
+				//pl("ALT: " + element.attr("alt"));
+				pl();
 				
 			}
 		
@@ -214,7 +242,7 @@ public class ScrapingImpl implements Scraping {
 			pl("TAG NAME: " + element.tagName());
 			//pl("HTML: " + element.html());
 			//pl("DATA: " + element.data());
-			//pl("TEXT: " + element.text());
+			pl("TEXT: " + element.text());
 			//pl("HREF: " + element.attr("abs:href"));
 			//pl("SRC: " + element.attr("abs:src"));
 			//pl("ALT: " + element.attr("alt"));
